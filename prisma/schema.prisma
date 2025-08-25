@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator typegraphql {
+  provider = "typegraphql-prisma"
+  output   = "../node_modules/@generated/typegraphql-prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive  Boolean  @default(true)
+
+  // Relations
+  createdContexts Context[] @relation("ContextCreator")
+
+}
+
+
+model Context {
+  id              String      @id @default(cuid())
+  contextType     ContextType @map("context_type")
+  title           String
+  slug            String      @unique
+  description     String?     @db.Text
+  markdownContent String?     @map("markdown_content") @db.Text
+  creatorId       String      @map("creator_id")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  // Connection-specific fields
+  sourceContextId String?         @map("source_context_id")
+  targetContextId String?         @map("target_context_id")
+  connectionType  ConnectionType? @map("connection_type")
+
+  // Conditional-specific fields
+  precedingContextId String? @map("preceding_context_id")
+  defaultTargetId    String? @map("default_target_id")
+
+  // Relations
+  creator User @relation("ContextCreator", fields: [creatorId], references: [id])
+
+  // Self-referential relations for connections
+  sourceContext Context? @relation("ContextSourceConnection", fields: [sourceContextId], references: [id])
+  targetContext Context? @relation("ContextTargetConnection", fields: [targetContextId], references: [id])
+  
+  // Self-referential for connections (reverse)
+  sourceConnections Context[] @relation("ContextSourceConnection")
+  targetConnections Context[] @relation("ContextTargetConnection")
+
+  // Self-referential relations for conditionals
+  precedingContext Context? @relation("ConditionalPreceding", fields: [precedingContextId], references: [id])
+  defaultTarget    Context? @relation("ConditionalDefault", fields: [defaultTargetId], references: [id])
+  
+  // Self-referential for conditionals (reverse)
+  precedingForContexts Context[] @relation("ConditionalPreceding")
+  defaultForContexts   Context[] @relation("ConditionalDefault")
+
+  // Junction table relations
+  mappingContexts     ContextMapping[]     @relation("MappingContext")
+  containedInMappings ContextMapping[]     @relation("ContainedContext")
+  conditionalTargets  ConditionalTarget[]  @relation("ConditionalContext")
+  targetInConditional ConditionalTarget[]  @relation("TargetContext")
+
+  @@index([contextType])
+  @@index([creatorId])
+  @@index([slug])
+  @@index([sourceContextId])
+  @@index([targetContextId])
+  @@index([precedingContextId])
+  @@map("contexts")
+}
+
+model ContextMapping {
+  id                  String   @id @default(cuid())
+  mappingContextId    String   @map("mapping_context_id")
+  containedContextId  String   @map("contained_context_id")
+  sortOrder           Int      @map("sort_order")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  mappingContext   Context @relation("MappingContext", fields: [mappingContextId], references: [id], onDelete: Cascade)
+  containedContext Context @relation("ContainedContext", fields: [containedContextId], references: [id], onDelete: Cascade)
+
+  @@unique([mappingContextId, containedContextId])
+  @@index([mappingContextId])
+  @@index([containedContextId])
+  @@index([sortOrder])
+  @@map("context_mappings")
+}
+
+model ConditionalTarget {
+  id                    String   @id @default(cuid())
+  conditionalContextId  String   @map("conditional_context_id")
+  targetContextId       String   @map("target_context_id")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  conditionalContext Context @relation("ConditionalContext", fields: [conditionalContextId], references: [id], onDelete: Cascade)
+  targetContext      Context @relation("TargetContext", fields: [targetContextId], references: [id], onDelete: Cascade)
+
+  @@unique([conditionalContextId, targetContextId])
+  @@index([conditionalContextId])
+  @@index([targetContextId])
+  @@map("conditional_targets")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+  VIEWER
+}
+
+enum ContextType {
+  NOTE
+  CONNECTION
+  MAPPING
+  CONDITIONAL
+}
+
+enum ConnectionType {
+  HAS_A
+  CONTAINS
+  PARENT_OF
+  DEPENDS_ON
+  RELATES_TO
+  REFERENCES
+}
