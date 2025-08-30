@@ -31,7 +31,7 @@ model User {
 
 model Context {
   id              String      @id @default(cuid())
-  contextType     ContextType @map("context_type")
+  contextType     ContextType @map("context_type") @default(NODE)
   title           String
   slug            String      @unique
   description     String?     @db.Text
@@ -43,7 +43,7 @@ model Context {
   // Connection-specific fields
   sourceContextId String?         @map("source_context_id")
   targetContextId String?         @map("target_context_id")
-  connectionType  ConnectionType? @map("connection_type")
+  relationshipType  RelationshipType? @map("relationship_type")
 
   // Conditional-specific fields
   precedingContextId String? @map("preceding_context_id")
@@ -126,13 +126,13 @@ enum UserRole {
 }
 
 enum ContextType {
-  NOTE
-  CONNECTION
+  RELATIONSHIP
   MAPPING
   CONDITIONAL
+  NODE
 }
 
-enum ConnectionType {
+enum RelationshipType {
   HAS_A
   CONTAINS
   PARENT_OF

@@ -379,19 +379,9 @@ input ConditionalTargetWhereUniqueInput {
   updatedAt: DateTimeFilter
 }
 
-enum ConnectionType {
-  CONTAINS
-  DEPENDS_ON
-  HAS_A
-  PARENT_OF
-  REFERENCES
-  RELATES_TO
-}
-
 type Context {
   _count: ContextCount
   conditionalTargets(cursor: ConditionalTargetWhereUniqueInput, distinct: [ConditionalTargetScalarFieldEnum!], orderBy: [ConditionalTargetOrderByWithRelationInput!], skip: Int, take: Int, where: ConditionalTargetWhereInput): [ConditionalTarget!]!
-  connectionType: ConnectionType
   containedInMappings(cursor: ContextMappingWhereUniqueInput, distinct: [ContextMappingScalarFieldEnum!], orderBy: [ContextMappingOrderByWithRelationInput!], skip: Int, take: Int, where: ContextMappingWhereInput): [ContextMapping!]!
   contextType: ContextType!
   createdAt: DateTimeISO!
@@ -407,6 +397,7 @@ type Context {
   precedingContext(where: ContextWhereInput): Context
   precedingContextId: String
   precedingForContexts(cursor: ContextWhereUniqueInput, distinct: [ContextScalarFieldEnum!], orderBy: [ContextOrderByWithRelationInput!], skip: Int, take: Int, where: ContextWhereInput): [Context!]!
+  relationshipType: RelationshipType
   slug: String!
   sourceConnections(cursor: ContextWhereUniqueInput, distinct: [ContextScalarFieldEnum!], orderBy: [ContextOrderByWithRelationInput!], skip: Int, take: Int, where: ContextWhereInput): [Context!]!
   sourceContext(where: ContextWhereInput): Context
@@ -432,7 +423,6 @@ type ContextCount {
 
 type ContextCountAggregate {
   _all: Int!
-  connectionType: Int!
   contextType: Int!
   createdAt: Int!
   creatorId: Int!
@@ -441,6 +431,7 @@ type ContextCountAggregate {
   id: Int!
   markdownContent: Int!
   precedingContextId: Int!
+  relationshipType: Int!
   slug: Int!
   sourceContextId: Int!
   targetContextId: Int!
@@ -449,7 +440,6 @@ type ContextCountAggregate {
 }
 
 input ContextCountOrderByAggregateInput {
-  connectionType: SortOrder
   contextType: SortOrder
   createdAt: SortOrder
   creatorId: SortOrder
@@ -458,6 +448,7 @@ input ContextCountOrderByAggregateInput {
   id: SortOrder
   markdownContent: SortOrder
   precedingContextId: SortOrder
+  relationshipType: SortOrder
   slug: SortOrder
   sourceContextId: SortOrder
   targetContextId: SortOrder
@@ -467,9 +458,8 @@ input ContextCountOrderByAggregateInput {
 
 input ContextCreateInput {
   conditionalTargets: ConditionalTargetCreateNestedManyWithoutConditionalContextInput
-  connectionType: ConnectionType
   containedInMappings: ContextMappingCreateNestedManyWithoutContainedContextInput
-  contextType: ContextType!
+  contextType: ContextType
   createdAt: DateTimeISO
   creator: UserCreateNestedOneWithoutCreatedContextsInput!
   defaultForContexts: ContextCreateNestedManyWithoutDefaultTargetInput
@@ -480,6 +470,7 @@ input ContextCreateInput {
   markdownContent: String
   precedingContext: ContextCreateNestedOneWithoutPrecedingForContextsInput
   precedingForContexts: ContextCreateNestedManyWithoutPrecedingContextInput
+  relationshipType: RelationshipType
   slug: String!
   sourceConnections: ContextCreateNestedManyWithoutSourceContextInput
   sourceContext: ContextCreateNestedOneWithoutSourceConnectionsInput
@@ -491,14 +482,14 @@ input ContextCreateInput {
 }
 
 input ContextCreateManyCreatorInput {
-  connectionType: ConnectionType
-  contextType: ContextType!
+  contextType: ContextType
   createdAt: DateTimeISO
   defaultTargetId: String
   description: String
   id: String
   markdownContent: String
   precedingContextId: String
+  relationshipType: RelationshipType
   slug: String!
   sourceContextId: String
   targetContextId: String
@@ -512,14 +503,14 @@ input ContextCreateManyCreatorInputEnvelope {
 }
 
 input ContextCreateManyDefaultTargetInput {
-  connectionType: ConnectionType
-  contextType: ContextType!
+  contextType: ContextType
   createdAt: DateTimeISO
   creatorId: String!
   description: String
   id: String
   markdownContent: String
   precedingContextId: String
+  relationshipType: RelationshipType
   slug: String!
   sourceContextId: String
   targetContextId: String
@@ -533,8 +524,7 @@ input ContextCreateManyDefaultTargetInputEnvelope {
 }
 
 input ContextCreateManyInput {
-  connectionType: ConnectionType
-  contextType: ContextType!
+  contextType: ContextType
   createdAt: DateTimeISO
   creatorId: String!
   defaultTargetId: String
@@ -542,6 +532,7 @@ input ContextCreateManyInput {
   id: String
   markdownContent: String
   precedingContextId: String
+  relationshipType: RelationshipType
   slug: String!
   sourceContextId: String
   targetContextId: String
@@ -550,14 +541,14 @@ input ContextCreateManyInput {
 }
 
 input ContextCreateManyPrecedingContextInput {
-  connectionType: ConnectionType
-  contextType: ContextType!
+  contextType: ContextType
   createdAt: DateTimeISO
   creatorId: String!
   defaultTargetId: String
   description: String
   id: String
   markdownContent: String
+  relationshipType: RelationshipType
   slug: String!
   sourceContextId: String
   targetContextId: String
@@ -571,8 +562,7 @@ input ContextCreateManyPrecedingContextInputEnvelope {
 }
 
 input ContextCreateManySourceContextInput {
-  connectionType: ConnectionType
-  contextType: ContextType!
+  contextType: ContextType
   createdAt: DateTimeISO
   creatorId: String!
   defaultTargetId: String
@@ -580,6 +570,7 @@ input ContextCreateManySourceContextInput {
   id: String
   markdownContent: String
   precedingContextId: String
+  relationshipType: RelationshipType
   slug: String!
   targetContextId: String
   title: String!
@@ -592,8 +583,7 @@ input ContextCreateManySourceContextInputEnvelope {
 }
 
 input ContextCreateManyTargetContextInput {
-  connectionType: ConnectionType
-  contextType: ContextType!
+  contextType: ContextType
   createdAt: DateTimeISO
   creatorId: String!
   defaultTargetId: String
@@ -601,6 +591,7 @@ input ContextCreateManyTargetContextInput {
   id: String
   markdownContent: String
   precedingContextId: String
+  relationshipType: RelationshipType
   slug: String!
   sourceContextId: String
   title: String!
@@ -761,9 +752,8 @@ input ContextCreateOrConnectWithoutTargetInConditionalInput {
 }
 
 input ContextCreateWithoutConditionalTargetsInput {
-  connectionType: ConnectionType
   containedInMappings: ContextMappingCreateNestedManyWithoutContainedContextInput
-  contextType: ContextType!
+  contextType: ContextType
   createdAt: DateTimeISO
   creator: UserCreateNestedOneWithoutCreatedContextsInput!
   defaultForContexts: ContextCreateNestedManyWithoutDefaultTargetInput
@@ -774,6 +764,7 @@ input ContextCreateWithoutConditionalTargetsInput {
   markdownContent: String
   precedingContext: ContextCreateNestedOneWithoutPrecedingForContextsInput
   precedingForContexts: ContextCreateNestedManyWithoutPrecedingContextInput
+  relationshipType: RelationshipType
   slug: String!
   sourceConnections: ContextCreateNestedManyWithoutSourceContextInput
   sourceContext: ContextCreateNestedOneWithoutSourceConnectionsInput
@@ -786,8 +777,7 @@ input ContextCreateWithoutConditionalTargetsInput {
 
 input ContextCreateWithoutContainedInMappingsInput {
   conditionalTargets: ConditionalTargetCreateNestedManyWithoutConditionalContextInput
-  connectionType: ConnectionType
-  contextType: ContextType!
+  contextType: ContextType
   createdAt: DateTimeISO
   creator: UserCreateNestedOneWithoutCreatedContextsInput!
   defaultForContexts: ContextCreateNestedManyWithoutDefaultTargetInput
@@ -798,6 +788,7 @@ input ContextCreateWithoutContainedInMappingsInput {
   markdownContent: String
   precedingContext: ContextCreateNestedOneWithoutPrecedingForContextsInput
   precedingForContexts: ContextCreateNestedManyWithoutPrecedingContextInput
+  relationshipType: RelationshipType
   slug: String!
   sourceConnections: ContextCreateNestedManyWithoutSourceContextInput
   sourceContext: ContextCreateNestedOneWithoutSourceConnectionsInput
@@ -810,9 +801,8 @@ input ContextCreateWithoutContainedInMappingsInput {
 
 input ContextCreateWithoutCreatorInput {
   conditionalTargets: ConditionalTargetCreateNestedManyWithoutConditionalContextInput
-  connectionType: ConnectionType
   containedInMappings: ContextMappingCreateNestedManyWithoutContainedContextInput
-  contextType: ContextType!
+  contextType: ContextType
   createdAt: DateTimeISO
   defaultForContexts: ContextCreateNestedManyWithoutDefaultTargetInput
   defaultTarget: ContextCreateNestedOneWithoutDefaultForContextsInput
@@ -822,6 +812,7 @@ input ContextCreateWithoutCreatorInput {
   markdownContent: String
   precedingContext: ContextCreateNestedOneWithoutPrecedingForContextsInput
   precedingForContexts: ContextCreateNestedManyWithoutPrecedingContextInput
+  relationshipType: RelationshipType
   slug: String!
   sourceConnections: ContextCreateNestedManyWithoutSourceContextInput
   sourceContext: ContextCreateNestedOneWithoutSourceConnectionsInput
@@ -834,9 +825,8 @@ input ContextCreateWithoutCreatorInput {
 
 input ContextCreateWithoutDefaultForContextsInput {
   conditionalTargets: ConditionalTargetCreateNestedManyWithoutConditionalContextInput
-  connectionType: ConnectionType
   containedInMappings: ContextMappingCreateNestedManyWithoutContainedContextInput
-  contextType: ContextType!
+  contextType: ContextType
   createdAt: DateTimeISO
   creator: UserCreateNestedOneWithoutCreatedContextsInput!
   defaultTarget: ContextCreateNestedOneWithoutDefaultForContextsInput
@@ -846,6 +836,7 @@ input ContextCreateWithoutDefaultForContextsInput {
   markdownContent: String
   precedingContext: ContextCreateNestedOneWithoutPrecedingForContextsInput
   precedingForContexts: ContextCreateNestedManyWithoutPrecedingContextInput
+  relationshipType: RelationshipType
   slug: String!
   sourceConnections: ContextCreateNestedManyWithoutSourceContextInput
   sourceContext: ContextCreateNestedOneWithoutSourceConnectionsInput
@@ -858,9 +849,8 @@ input ContextCreateWithoutDefaultForContextsInput {
 
 input ContextCreateWithoutDefaultTargetInput {
   conditionalTargets: ConditionalTargetCreateNestedManyWithoutConditionalContextInput
-  connectionType: ConnectionType
   containedInMappings: ContextMappingCreateNestedManyWithoutContainedContextInput
-  contextType: ContextType!
+  contextType: ContextType
   createdAt: DateTimeISO
   creator: UserCreateNestedOneWithoutCreatedContextsInput!
   defaultForContexts: ContextCreateNestedManyWithoutDefaultTargetInput
@@ -870,6 +860,7 @@ input ContextCreateWithoutDefaultTargetInput {
   markdownContent: String
   precedingContext: ContextCreateNestedOneWithoutPrecedingForContextsInput
   precedingForContexts: ContextCreateNestedManyWithoutPrecedingContextInput
+  relationshipType: RelationshipType
   slug: String!
   sourceConnections: ContextCreateNestedManyWithoutSourceContextInput
   sourceContext: ContextCreateNestedOneWithoutSourceConnectionsInput
@@ -882,9 +873,8 @@ input ContextCreateWithoutDefaultTargetInput {
 
 input ContextCreateWithoutMappingContextsInput {
   conditionalTargets: ConditionalTargetCreateNestedManyWithoutConditionalContextInput
-  connectionType: ConnectionType
   containedInMappings: ContextMappingCreateNestedManyWithoutContainedContextInput
-  contextType: ContextType!
+  contextType: ContextType
   createdAt: DateTimeISO
   creator: UserCreateNestedOneWithoutCreatedContextsInput!
   defaultForContexts: ContextCreateNestedManyWithoutDefaultTargetInput
@@ -894,6 +884,7 @@ input ContextCreateWithoutMappingContextsInput {
   markdownContent: String
   precedingContext: ContextCreateNestedOneWithoutPrecedingForContextsInput
   precedingForContexts: ContextCreateNestedManyWithoutPrecedingContextInput
+  relationshipType: RelationshipType
   slug: String!
   sourceConnections: ContextCreateNestedManyWithoutSourceContextInput
   sourceContext: ContextCreateNestedOneWithoutSourceConnectionsInput
@@ -906,9 +897,8 @@ input ContextCreateWithoutMappingContextsInput {
 
 input ContextCreateWithoutPrecedingContextInput {
   conditionalTargets: ConditionalTargetCreateNestedManyWithoutConditionalContextInput
-  connectionType: ConnectionType
   containedInMappings: ContextMappingCreateNestedManyWithoutContainedContextInput
-  contextType: ContextType!
+  contextType: ContextType
   createdAt: DateTimeISO
   creator: UserCreateNestedOneWithoutCreatedContextsInput!
   defaultForContexts: ContextCreateNestedManyWithoutDefaultTargetInput
@@ -918,6 +908,7 @@ input ContextCreateWithoutPrecedingContextInput {
   mappingContexts: ContextMappingCreateNestedManyWithoutMappingContextInput
   markdownContent: String
   precedingForContexts: ContextCreateNestedManyWithoutPrecedingContextInput
+  relationshipType: RelationshipType
   slug: String!
   sourceConnections: ContextCreateNestedManyWithoutSourceContextInput
   sourceContext: ContextCreateNestedOneWithoutSourceConnectionsInput
@@ -930,9 +921,8 @@ input ContextCreateWithoutPrecedingContextInput {
 
 input ContextCreateWithoutPrecedingForContextsInput {
   conditionalTargets: ConditionalTargetCreateNestedManyWithoutConditionalContextInput
-  connectionType: ConnectionType
   containedInMappings: ContextMappingCreateNestedManyWithoutContainedContextInput
-  contextType: ContextType!
+  contextType: ContextType
   createdAt: DateTimeISO
   creator: UserCreateNestedOneWithoutCreatedContextsInput!
   defaultForContexts: ContextCreateNestedManyWithoutDefaultTargetInput
@@ -942,6 +932,7 @@ input ContextCreateWithoutPrecedingForContextsInput {
   mappingContexts: ContextMappingCreateNestedManyWithoutMappingContextInput
   markdownContent: String
   precedingContext: ContextCreateNestedOneWithoutPrecedingForContextsInput
+  relationshipType: RelationshipType
   slug: String!
   sourceConnections: ContextCreateNestedManyWithoutSourceContextInput
   sourceContext: ContextCreateNestedOneWithoutSourceConnectionsInput
@@ -954,9 +945,8 @@ input ContextCreateWithoutPrecedingForContextsInput {
 
 input ContextCreateWithoutSourceConnectionsInput {
   conditionalTargets: ConditionalTargetCreateNestedManyWithoutConditionalContextInput
-  connectionType: ConnectionType
   containedInMappings: ContextMappingCreateNestedManyWithoutContainedContextInput
-  contextType: ContextType!
+  contextType: ContextType
   createdAt: DateTimeISO
   creator: UserCreateNestedOneWithoutCreatedContextsInput!
   defaultForContexts: ContextCreateNestedManyWithoutDefaultTargetInput
@@ -967,6 +957,7 @@ input ContextCreateWithoutSourceConnectionsInput {
   markdownContent: String
   precedingContext: ContextCreateNestedOneWithoutPrecedingForContextsInput
   precedingForContexts: ContextCreateNestedManyWithoutPrecedingContextInput
+  relationshipType: RelationshipType
   slug: String!
   sourceContext: ContextCreateNestedOneWithoutSourceConnectionsInput
   targetConnections: ContextCreateNestedManyWithoutTargetContextInput
@@ -978,9 +969,8 @@ input ContextCreateWithoutSourceConnectionsInput {
 
 input ContextCreateWithoutSourceContextInput {
   conditionalTargets: ConditionalTargetCreateNestedManyWithoutConditionalContextInput
-  connectionType: ConnectionType
   containedInMappings: ContextMappingCreateNestedManyWithoutContainedContextInput
-  contextType: ContextType!
+  contextType: ContextType
   createdAt: DateTimeISO
   creator: UserCreateNestedOneWithoutCreatedContextsInput!
   defaultForContexts: ContextCreateNestedManyWithoutDefaultTargetInput
@@ -991,6 +981,7 @@ input ContextCreateWithoutSourceContextInput {
   markdownContent: String
   precedingContext: ContextCreateNestedOneWithoutPrecedingForContextsInput
   precedingForContexts: ContextCreateNestedManyWithoutPrecedingContextInput
+  relationshipType: RelationshipType
   slug: String!
   sourceConnections: ContextCreateNestedManyWithoutSourceContextInput
   targetConnections: ContextCreateNestedManyWithoutTargetContextInput
@@ -1002,9 +993,8 @@ input ContextCreateWithoutSourceContextInput {
 
 input ContextCreateWithoutTargetConnectionsInput {
   conditionalTargets: ConditionalTargetCreateNestedManyWithoutConditionalContextInput
-  connectionType: ConnectionType
   containedInMappings: ContextMappingCreateNestedManyWithoutContainedContextInput
-  contextType: ContextType!
+  contextType: ContextType
   createdAt: DateTimeISO
   creator: UserCreateNestedOneWithoutCreatedContextsInput!
   defaultForContexts: ContextCreateNestedManyWithoutDefaultTargetInput
@@ -1015,6 +1005,7 @@ input ContextCreateWithoutTargetConnectionsInput {
   markdownContent: String
   precedingContext: ContextCreateNestedOneWithoutPrecedingForContextsInput
   precedingForContexts: ContextCreateNestedManyWithoutPrecedingContextInput
+  relationshipType: RelationshipType
   slug: String!
   sourceConnections: ContextCreateNestedManyWithoutSourceContextInput
   sourceContext: ContextCreateNestedOneWithoutSourceConnectionsInput
@@ -1026,9 +1017,8 @@ input ContextCreateWithoutTargetConnectionsInput {
 
 input ContextCreateWithoutTargetContextInput {
   conditionalTargets: ConditionalTargetCreateNestedManyWithoutConditionalContextInput
-  connectionType: ConnectionType
   containedInMappings: ContextMappingCreateNestedManyWithoutContainedContextInput
-  contextType: ContextType!
+  contextType: ContextType
   createdAt: DateTimeISO
   creator: UserCreateNestedOneWithoutCreatedContextsInput!
   defaultForContexts: ContextCreateNestedManyWithoutDefaultTargetInput
@@ -1039,6 +1029,7 @@ input ContextCreateWithoutTargetContextInput {
   markdownContent: String
   precedingContext: ContextCreateNestedOneWithoutPrecedingForContextsInput
   precedingForContexts: ContextCreateNestedManyWithoutPrecedingContextInput
+  relationshipType: RelationshipType
   slug: String!
   sourceConnections: ContextCreateNestedManyWithoutSourceContextInput
   sourceContext: ContextCreateNestedOneWithoutSourceConnectionsInput
@@ -1050,9 +1041,8 @@ input ContextCreateWithoutTargetContextInput {
 
 input ContextCreateWithoutTargetInConditionalInput {
   conditionalTargets: ConditionalTargetCreateNestedManyWithoutConditionalContextInput
-  connectionType: ConnectionType
   containedInMappings: ContextMappingCreateNestedManyWithoutContainedContextInput
-  contextType: ContextType!
+  contextType: ContextType
   createdAt: DateTimeISO
   creator: UserCreateNestedOneWithoutCreatedContextsInput!
   defaultForContexts: ContextCreateNestedManyWithoutDefaultTargetInput
@@ -1063,6 +1053,7 @@ input ContextCreateWithoutTargetInConditionalInput {
   markdownContent: String
   precedingContext: ContextCreateNestedOneWithoutPrecedingForContextsInput
   precedingForContexts: ContextCreateNestedManyWithoutPrecedingContextInput
+  relationshipType: RelationshipType
   slug: String!
   sourceConnections: ContextCreateNestedManyWithoutSourceContextInput
   sourceContext: ContextCreateNestedOneWithoutSourceConnectionsInput
@@ -1076,7 +1067,6 @@ type ContextGroupBy {
   _count: ContextCountAggregate
   _max: ContextMaxAggregate
   _min: ContextMinAggregate
-  connectionType: ConnectionType
   contextType: ContextType!
   createdAt: DateTimeISO!
   creatorId: String!
@@ -1085,6 +1075,7 @@ type ContextGroupBy {
   id: String!
   markdownContent: String
   precedingContextId: String
+  relationshipType: RelationshipType
   slug: String!
   sourceContextId: String
   targetContextId: String
@@ -1473,7 +1464,6 @@ input ContextMappingWhereUniqueInput {
 }
 
 type ContextMaxAggregate {
-  connectionType: ConnectionType
   contextType: ContextType
   createdAt: DateTimeISO
   creatorId: String
@@ -1482,6 +1472,7 @@ type ContextMaxAggregate {
   id: String
   markdownContent: String
   precedingContextId: String
+  relationshipType: RelationshipType
   slug: String
   sourceContextId: String
   targetContextId: String
@@ -1490,7 +1481,6 @@ type ContextMaxAggregate {
 }
 
 input ContextMaxOrderByAggregateInput {
-  connectionType: SortOrder
   contextType: SortOrder
   createdAt: SortOrder
   creatorId: SortOrder
@@ -1499,6 +1489,7 @@ input ContextMaxOrderByAggregateInput {
   id: SortOrder
   markdownContent: SortOrder
   precedingContextId: SortOrder
+  relationshipType: SortOrder
   slug: SortOrder
   sourceContextId: SortOrder
   targetContextId: SortOrder
@@ -1507,7 +1498,6 @@ input ContextMaxOrderByAggregateInput {
 }
 
 type ContextMinAggregate {
-  connectionType: ConnectionType
   contextType: ContextType
   createdAt: DateTimeISO
   creatorId: String
@@ -1516,6 +1506,7 @@ type ContextMinAggregate {
   id: String
   markdownContent: String
   precedingContextId: String
+  relationshipType: RelationshipType
   slug: String
   sourceContextId: String
   targetContextId: String
@@ -1524,7 +1515,6 @@ type ContextMinAggregate {
 }
 
 input ContextMinOrderByAggregateInput {
-  connectionType: SortOrder
   contextType: SortOrder
   createdAt: SortOrder
   creatorId: SortOrder
@@ -1533,6 +1523,7 @@ input ContextMinOrderByAggregateInput {
   id: SortOrder
   markdownContent: SortOrder
   precedingContextId: SortOrder
+  relationshipType: SortOrder
   slug: SortOrder
   sourceContextId: SortOrder
   targetContextId: SortOrder
@@ -1553,7 +1544,6 @@ input ContextOrderByWithAggregationInput {
   _count: ContextCountOrderByAggregateInput
   _max: ContextMaxOrderByAggregateInput
   _min: ContextMinOrderByAggregateInput
-  connectionType: SortOrderInput
   contextType: SortOrder
   createdAt: SortOrder
   creatorId: SortOrder
@@ -1562,6 +1552,7 @@ input ContextOrderByWithAggregationInput {
   id: SortOrder
   markdownContent: SortOrderInput
   precedingContextId: SortOrderInput
+  relationshipType: SortOrderInput
   slug: SortOrder
   sourceContextId: SortOrderInput
   targetContextId: SortOrderInput
@@ -1571,7 +1562,6 @@ input ContextOrderByWithAggregationInput {
 
 input ContextOrderByWithRelationInput {
   conditionalTargets: ConditionalTargetOrderByRelationAggregateInput
-  connectionType: SortOrderInput
   containedInMappings: ContextMappingOrderByRelationAggregateInput
   contextType: SortOrder
   createdAt: SortOrder
@@ -1587,6 +1577,7 @@ input ContextOrderByWithRelationInput {
   precedingContext: ContextOrderByWithRelationInput
   precedingContextId: SortOrderInput
   precedingForContexts: ContextOrderByRelationAggregateInput
+  relationshipType: SortOrderInput
   slug: SortOrder
   sourceConnections: ContextOrderByRelationAggregateInput
   sourceContext: ContextOrderByWithRelationInput
@@ -1605,7 +1596,6 @@ input ContextRelationFilter {
 }
 
 enum ContextScalarFieldEnum {
-  connectionType
   contextType
   createdAt
   creatorId
@@ -1614,6 +1604,7 @@ enum ContextScalarFieldEnum {
   id
   markdownContent
   precedingContextId
+  relationshipType
   slug
   sourceContextId
   targetContextId
@@ -1625,7 +1616,6 @@ input ContextScalarWhereInput {
   AND: [ContextScalarWhereInput!]
   NOT: [ContextScalarWhereInput!]
   OR: [ContextScalarWhereInput!]
-  connectionType: EnumConnectionTypeNullableFilter
   contextType: EnumContextTypeFilter
   createdAt: DateTimeFilter
   creatorId: StringFilter
@@ -1634,6 +1624,7 @@ input ContextScalarWhereInput {
   id: StringFilter
   markdownContent: StringNullableFilter
   precedingContextId: StringNullableFilter
+  relationshipType: EnumRelationshipTypeNullableFilter
   slug: StringFilter
   sourceContextId: StringNullableFilter
   targetContextId: StringNullableFilter
@@ -1645,7 +1636,6 @@ input ContextScalarWhereWithAggregatesInput {
   AND: [ContextScalarWhereWithAggregatesInput!]
   NOT: [ContextScalarWhereWithAggregatesInput!]
   OR: [ContextScalarWhereWithAggregatesInput!]
-  connectionType: EnumConnectionTypeNullableWithAggregatesFilter
   contextType: EnumContextTypeWithAggregatesFilter
   createdAt: DateTimeWithAggregatesFilter
   creatorId: StringWithAggregatesFilter
@@ -1654,6 +1644,7 @@ input ContextScalarWhereWithAggregatesInput {
   id: StringWithAggregatesFilter
   markdownContent: StringNullableWithAggregatesFilter
   precedingContextId: StringNullableWithAggregatesFilter
+  relationshipType: EnumRelationshipTypeNullableWithAggregatesFilter
   slug: StringWithAggregatesFilter
   sourceContextId: StringNullableWithAggregatesFilter
   targetContextId: StringNullableWithAggregatesFilter
@@ -1663,14 +1654,13 @@ input ContextScalarWhereWithAggregatesInput {
 
 enum ContextType {
   CONDITIONAL
-  CONNECTION
   MAPPING
-  NOTE
+  NODE
+  RELATIONSHIP
 }
 
 input ContextUpdateInput {
   conditionalTargets: ConditionalTargetUpdateManyWithoutConditionalContextNestedInput
-  connectionType: NullableEnumConnectionTypeFieldUpdateOperationsInput
   containedInMappings: ContextMappingUpdateManyWithoutContainedContextNestedInput
   contextType: EnumContextTypeFieldUpdateOperationsInput
   createdAt: DateTimeFieldUpdateOperationsInput
@@ -1683,6 +1673,7 @@ input ContextUpdateInput {
   markdownContent: NullableStringFieldUpdateOperationsInput
   precedingContext: ContextUpdateOneWithoutPrecedingForContextsNestedInput
   precedingForContexts: ContextUpdateManyWithoutPrecedingContextNestedInput
+  relationshipType: NullableEnumRelationshipTypeFieldUpdateOperationsInput
   slug: StringFieldUpdateOperationsInput
   sourceConnections: ContextUpdateManyWithoutSourceContextNestedInput
   sourceContext: ContextUpdateOneWithoutSourceConnectionsNestedInput
@@ -1694,12 +1685,12 @@ input ContextUpdateInput {
 }
 
 input ContextUpdateManyMutationInput {
-  connectionType: NullableEnumConnectionTypeFieldUpdateOperationsInput
   contextType: EnumContextTypeFieldUpdateOperationsInput
   createdAt: DateTimeFieldUpdateOperationsInput
   description: NullableStringFieldUpdateOperationsInput
   id: StringFieldUpdateOperationsInput
   markdownContent: NullableStringFieldUpdateOperationsInput
+  relationshipType: NullableEnumRelationshipTypeFieldUpdateOperationsInput
   slug: StringFieldUpdateOperationsInput
   title: StringFieldUpdateOperationsInput
   updatedAt: DateTimeFieldUpdateOperationsInput
@@ -1938,7 +1929,6 @@ input ContextUpdateWithWhereUniqueWithoutTargetContextInput {
 }
 
 input ContextUpdateWithoutConditionalTargetsInput {
-  connectionType: NullableEnumConnectionTypeFieldUpdateOperationsInput
   containedInMappings: ContextMappingUpdateManyWithoutContainedContextNestedInput
   contextType: EnumContextTypeFieldUpdateOperationsInput
   createdAt: DateTimeFieldUpdateOperationsInput
@@ -1951,6 +1941,7 @@ input ContextUpdateWithoutConditionalTargetsInput {
   markdownContent: NullableStringFieldUpdateOperationsInput
   precedingContext: ContextUpdateOneWithoutPrecedingForContextsNestedInput
   precedingForContexts: ContextUpdateManyWithoutPrecedingContextNestedInput
+  relationshipType: NullableEnumRelationshipTypeFieldUpdateOperationsInput
   slug: StringFieldUpdateOperationsInput
   sourceConnections: ContextUpdateManyWithoutSourceContextNestedInput
   sourceContext: ContextUpdateOneWithoutSourceConnectionsNestedInput
@@ -1963,7 +1954,6 @@ input ContextUpdateWithoutConditionalTargetsInput {
 
 input ContextUpdateWithoutContainedInMappingsInput {
   conditionalTargets: ConditionalTargetUpdateManyWithoutConditionalContextNestedInput
-  connectionType: NullableEnumConnectionTypeFieldUpdateOperationsInput
   contextType: EnumContextTypeFieldUpdateOperationsInput
   createdAt: DateTimeFieldUpdateOperationsInput
   creator: UserUpdateOneRequiredWithoutCreatedContextsNestedInput
@@ -1975,6 +1965,7 @@ input ContextUpdateWithoutContainedInMappingsInput {
   markdownContent: NullableStringFieldUpdateOperationsInput
   precedingContext: ContextUpdateOneWithoutPrecedingForContextsNestedInput
   precedingForContexts: ContextUpdateManyWithoutPrecedingContextNestedInput
+  relationshipType: NullableEnumRelationshipTypeFieldUpdateOperationsInput
   slug: StringFieldUpdateOperationsInput
   sourceConnections: ContextUpdateManyWithoutSourceContextNestedInput
   sourceContext: ContextUpdateOneWithoutSourceConnectionsNestedInput
@@ -1987,7 +1978,6 @@ input ContextUpdateWithoutContainedInMappingsInput {
 
 input ContextUpdateWithoutCreatorInput {
   conditionalTargets: ConditionalTargetUpdateManyWithoutConditionalContextNestedInput
-  connectionType: NullableEnumConnectionTypeFieldUpdateOperationsInput
   containedInMappings: ContextMappingUpdateManyWithoutContainedContextNestedInput
   contextType: EnumContextTypeFieldUpdateOperationsInput
   createdAt: DateTimeFieldUpdateOperationsInput
@@ -1999,6 +1989,7 @@ input ContextUpdateWithoutCreatorInput {
   markdownContent: NullableStringFieldUpdateOperationsInput
   precedingContext: ContextUpdateOneWithoutPrecedingForContextsNestedInput
   precedingForContexts: ContextUpdateManyWithoutPrecedingContextNestedInput
+  relationshipType: NullableEnumRelationshipTypeFieldUpdateOperationsInput
   slug: StringFieldUpdateOperationsInput
   sourceConnections: ContextUpdateManyWithoutSourceContextNestedInput
   sourceContext: ContextUpdateOneWithoutSourceConnectionsNestedInput
@@ -2011,7 +2002,6 @@ input ContextUpdateWithoutCreatorInput {
 
 input ContextUpdateWithoutDefaultForContextsInput {
   conditionalTargets: ConditionalTargetUpdateManyWithoutConditionalContextNestedInput
-  connectionType: NullableEnumConnectionTypeFieldUpdateOperationsInput
   containedInMappings: ContextMappingUpdateManyWithoutContainedContextNestedInput
   contextType: EnumContextTypeFieldUpdateOperationsInput
   createdAt: DateTimeFieldUpdateOperationsInput
@@ -2023,6 +2013,7 @@ input ContextUpdateWithoutDefaultForContextsInput {
   markdownContent: NullableStringFieldUpdateOperationsInput
   precedingContext: ContextUpdateOneWithoutPrecedingForContextsNestedInput
   precedingForContexts: ContextUpdateManyWithoutPrecedingContextNestedInput
+  relationshipType: NullableEnumRelationshipTypeFieldUpdateOperationsInput
   slug: StringFieldUpdateOperationsInput
   sourceConnections: ContextUpdateManyWithoutSourceContextNestedInput
   sourceContext: ContextUpdateOneWithoutSourceConnectionsNestedInput
@@ -2035,7 +2026,6 @@ input ContextUpdateWithoutDefaultForContextsInput {
 
 input ContextUpdateWithoutDefaultTargetInput {
   conditionalTargets: ConditionalTargetUpdateManyWithoutConditionalContextNestedInput
-  connectionType: NullableEnumConnectionTypeFieldUpdateOperationsInput
   containedInMappings: ContextMappingUpdateManyWithoutContainedContextNestedInput
   contextType: EnumContextTypeFieldUpdateOperationsInput
   createdAt: DateTimeFieldUpdateOperationsInput
@@ -2047,6 +2037,7 @@ input ContextUpdateWithoutDefaultTargetInput {
   markdownContent: NullableStringFieldUpdateOperationsInput
   precedingContext: ContextUpdateOneWithoutPrecedingForContextsNestedInput
   precedingForContexts: ContextUpdateManyWithoutPrecedingContextNestedInput
+  relationshipType: NullableEnumRelationshipTypeFieldUpdateOperationsInput
   slug: StringFieldUpdateOperationsInput
   sourceConnections: ContextUpdateManyWithoutSourceContextNestedInput
   sourceContext: ContextUpdateOneWithoutSourceConnectionsNestedInput
@@ -2059,7 +2050,6 @@ input ContextUpdateWithoutDefaultTargetInput {
 
 input ContextUpdateWithoutMappingContextsInput {
   conditionalTargets: ConditionalTargetUpdateManyWithoutConditionalContextNestedInput
-  connectionType: NullableEnumConnectionTypeFieldUpdateOperationsInput
   containedInMappings: ContextMappingUpdateManyWithoutContainedContextNestedInput
   contextType: EnumContextTypeFieldUpdateOperationsInput
   createdAt: DateTimeFieldUpdateOperationsInput
@@ -2071,6 +2061,7 @@ input ContextUpdateWithoutMappingContextsInput {
   markdownContent: NullableStringFieldUpdateOperationsInput
   precedingContext: ContextUpdateOneWithoutPrecedingForContextsNestedInput
   precedingForContexts: ContextUpdateManyWithoutPrecedingContextNestedInput
+  relationshipType: NullableEnumRelationshipTypeFieldUpdateOperationsInput
   slug: StringFieldUpdateOperationsInput
   sourceConnections: ContextUpdateManyWithoutSourceContextNestedInput
   sourceContext: ContextUpdateOneWithoutSourceConnectionsNestedInput
@@ -2083,7 +2074,6 @@ input ContextUpdateWithoutMappingContextsInput {
 
 input ContextUpdateWithoutPrecedingContextInput {
   conditionalTargets: ConditionalTargetUpdateManyWithoutConditionalContextNestedInput
-  connectionType: NullableEnumConnectionTypeFieldUpdateOperationsInput
   containedInMappings: ContextMappingUpdateManyWithoutContainedContextNestedInput
   contextType: EnumContextTypeFieldUpdateOperationsInput
   createdAt: DateTimeFieldUpdateOperationsInput
@@ -2095,6 +2085,7 @@ input ContextUpdateWithoutPrecedingContextInput {
   mappingContexts: ContextMappingUpdateManyWithoutMappingContextNestedInput
   markdownContent: NullableStringFieldUpdateOperationsInput
   precedingForContexts: ContextUpdateManyWithoutPrecedingContextNestedInput
+  relationshipType: NullableEnumRelationshipTypeFieldUpdateOperationsInput
   slug: StringFieldUpdateOperationsInput
   sourceConnections: ContextUpdateManyWithoutSourceContextNestedInput
   sourceContext: ContextUpdateOneWithoutSourceConnectionsNestedInput
@@ -2107,7 +2098,6 @@ input ContextUpdateWithoutPrecedingContextInput {
 
 input ContextUpdateWithoutPrecedingForContextsInput {
   conditionalTargets: ConditionalTargetUpdateManyWithoutConditionalContextNestedInput
-  connectionType: NullableEnumConnectionTypeFieldUpdateOperationsInput
   containedInMappings: ContextMappingUpdateManyWithoutContainedContextNestedInput
   contextType: EnumContextTypeFieldUpdateOperationsInput
   createdAt: DateTimeFieldUpdateOperationsInput
@@ -2119,6 +2109,7 @@ input ContextUpdateWithoutPrecedingForContextsInput {
   mappingContexts: ContextMappingUpdateManyWithoutMappingContextNestedInput
   markdownContent: NullableStringFieldUpdateOperationsInput
   precedingContext: ContextUpdateOneWithoutPrecedingForContextsNestedInput
+  relationshipType: NullableEnumRelationshipTypeFieldUpdateOperationsInput
   slug: StringFieldUpdateOperationsInput
   sourceConnections: ContextUpdateManyWithoutSourceContextNestedInput
   sourceContext: ContextUpdateOneWithoutSourceConnectionsNestedInput
@@ -2131,7 +2122,6 @@ input ContextUpdateWithoutPrecedingForContextsInput {
 
 input ContextUpdateWithoutSourceConnectionsInput {
   conditionalTargets: ConditionalTargetUpdateManyWithoutConditionalContextNestedInput
-  connectionType: NullableEnumConnectionTypeFieldUpdateOperationsInput
   containedInMappings: ContextMappingUpdateManyWithoutContainedContextNestedInput
   contextType: EnumContextTypeFieldUpdateOperationsInput
   createdAt: DateTimeFieldUpdateOperationsInput
@@ -2144,6 +2134,7 @@ input ContextUpdateWithoutSourceConnectionsInput {
   markdownContent: NullableStringFieldUpdateOperationsInput
   precedingContext: ContextUpdateOneWithoutPrecedingForContextsNestedInput
   precedingForContexts: ContextUpdateManyWithoutPrecedingContextNestedInput
+  relationshipType: NullableEnumRelationshipTypeFieldUpdateOperationsInput
   slug: StringFieldUpdateOperationsInput
   sourceContext: ContextUpdateOneWithoutSourceConnectionsNestedInput
   targetConnections: ContextUpdateManyWithoutTargetContextNestedInput
@@ -2155,7 +2146,6 @@ input ContextUpdateWithoutSourceConnectionsInput {
 
 input ContextUpdateWithoutSourceContextInput {
   conditionalTargets: ConditionalTargetUpdateManyWithoutConditionalContextNestedInput
-  connectionType: NullableEnumConnectionTypeFieldUpdateOperationsInput
   containedInMappings: ContextMappingUpdateManyWithoutContainedContextNestedInput
   contextType: EnumContextTypeFieldUpdateOperationsInput
   createdAt: DateTimeFieldUpdateOperationsInput
@@ -2168,6 +2158,7 @@ input ContextUpdateWithoutSourceContextInput {
   markdownContent: NullableStringFieldUpdateOperationsInput
   precedingContext: ContextUpdateOneWithoutPrecedingForContextsNestedInput
   precedingForContexts: ContextUpdateManyWithoutPrecedingContextNestedInput
+  relationshipType: NullableEnumRelationshipTypeFieldUpdateOperationsInput
   slug: StringFieldUpdateOperationsInput
   sourceConnections: ContextUpdateManyWithoutSourceContextNestedInput
   targetConnections: ContextUpdateManyWithoutTargetContextNestedInput
@@ -2179,7 +2170,6 @@ input ContextUpdateWithoutSourceContextInput {
 
 input ContextUpdateWithoutTargetConnectionsInput {
   conditionalTargets: ConditionalTargetUpdateManyWithoutConditionalContextNestedInput
-  connectionType: NullableEnumConnectionTypeFieldUpdateOperationsInput
   containedInMappings: ContextMappingUpdateManyWithoutContainedContextNestedInput
   contextType: EnumContextTypeFieldUpdateOperationsInput
   createdAt: DateTimeFieldUpdateOperationsInput
@@ -2192,6 +2182,7 @@ input ContextUpdateWithoutTargetConnectionsInput {
   markdownContent: NullableStringFieldUpdateOperationsInput
   precedingContext: ContextUpdateOneWithoutPrecedingForContextsNestedInput
   precedingForContexts: ContextUpdateManyWithoutPrecedingContextNestedInput
+  relationshipType: NullableEnumRelationshipTypeFieldUpdateOperationsInput
   slug: StringFieldUpdateOperationsInput
   sourceConnections: ContextUpdateManyWithoutSourceContextNestedInput
   sourceContext: ContextUpdateOneWithoutSourceConnectionsNestedInput
@@ -2203,7 +2194,6 @@ input ContextUpdateWithoutTargetConnectionsInput {
 
 input ContextUpdateWithoutTargetContextInput {
   conditionalTargets: ConditionalTargetUpdateManyWithoutConditionalContextNestedInput
-  connectionType: NullableEnumConnectionTypeFieldUpdateOperationsInput
   containedInMappings: ContextMappingUpdateManyWithoutContainedContextNestedInput
   contextType: EnumContextTypeFieldUpdateOperationsInput
   createdAt: DateTimeFieldUpdateOperationsInput
@@ -2216,6 +2206,7 @@ input ContextUpdateWithoutTargetContextInput {
   markdownContent: NullableStringFieldUpdateOperationsInput
   precedingContext: ContextUpdateOneWithoutPrecedingForContextsNestedInput
   precedingForContexts: ContextUpdateManyWithoutPrecedingContextNestedInput
+  relationshipType: NullableEnumRelationshipTypeFieldUpdateOperationsInput
   slug: StringFieldUpdateOperationsInput
   sourceConnections: ContextUpdateManyWithoutSourceContextNestedInput
   sourceContext: ContextUpdateOneWithoutSourceConnectionsNestedInput
@@ -2227,7 +2218,6 @@ input ContextUpdateWithoutTargetContextInput {
 
 input ContextUpdateWithoutTargetInConditionalInput {
   conditionalTargets: ConditionalTargetUpdateManyWithoutConditionalContextNestedInput
-  connectionType: NullableEnumConnectionTypeFieldUpdateOperationsInput
   containedInMappings: ContextMappingUpdateManyWithoutContainedContextNestedInput
   contextType: EnumContextTypeFieldUpdateOperationsInput
   createdAt: DateTimeFieldUpdateOperationsInput
@@ -2240,6 +2230,7 @@ input ContextUpdateWithoutTargetInConditionalInput {
   markdownContent: NullableStringFieldUpdateOperationsInput
   precedingContext: ContextUpdateOneWithoutPrecedingForContextsNestedInput
   precedingForContexts: ContextUpdateManyWithoutPrecedingContextNestedInput
+  relationshipType: NullableEnumRelationshipTypeFieldUpdateOperationsInput
   slug: StringFieldUpdateOperationsInput
   sourceConnections: ContextUpdateManyWithoutSourceContextNestedInput
   sourceContext: ContextUpdateOneWithoutSourceConnectionsNestedInput
@@ -2332,7 +2323,6 @@ input ContextWhereInput {
   NOT: [ContextWhereInput!]
   OR: [ContextWhereInput!]
   conditionalTargets: ConditionalTargetListRelationFilter
-  connectionType: EnumConnectionTypeNullableFilter
   containedInMappings: ContextMappingListRelationFilter
   contextType: EnumContextTypeFilter
   createdAt: DateTimeFilter
@@ -2348,6 +2338,7 @@ input ContextWhereInput {
   precedingContext: ContextNullableRelationFilter
   precedingContextId: StringNullableFilter
   precedingForContexts: ContextListRelationFilter
+  relationshipType: EnumRelationshipTypeNullableFilter
   slug: StringFilter
   sourceConnections: ContextListRelationFilter
   sourceContext: ContextNullableRelationFilter
@@ -2365,7 +2356,6 @@ input ContextWhereUniqueInput {
   NOT: [ContextWhereInput!]
   OR: [ContextWhereInput!]
   conditionalTargets: ConditionalTargetListRelationFilter
-  connectionType: EnumConnectionTypeNullableFilter
   containedInMappings: ContextMappingListRelationFilter
   contextType: EnumContextTypeFilter
   createdAt: DateTimeFilter
@@ -2381,6 +2371,7 @@ input ContextWhereUniqueInput {
   precedingContext: ContextNullableRelationFilter
   precedingContextId: StringNullableFilter
   precedingForContexts: ContextListRelationFilter
+  relationshipType: EnumRelationshipTypeNullableFilter
   slug: String
   sourceConnections: ContextListRelationFilter
   sourceContext: ContextNullableRelationFilter
@@ -2404,7 +2395,6 @@ type CreateManyAndReturnConditionalTarget {
 }
 
 type CreateManyAndReturnContext {
-  connectionType: ConnectionType
   contextType: ContextType!
   createdAt: DateTimeISO!
   creator: User!
@@ -2416,6 +2406,7 @@ type CreateManyAndReturnContext {
   markdownContent: String
   precedingContext(where: ContextWhereInput): Context
   precedingContextId: String
+  relationshipType: RelationshipType
   slug: String!
   sourceContext(where: ContextWhereInput): Context
   sourceContextId: String
@@ -2480,23 +2471,6 @@ input DateTimeWithAggregatesFilter {
   notIn: [DateTimeISO!]
 }
 
-input EnumConnectionTypeNullableFilter {
-  equals: ConnectionType
-  in: [ConnectionType!]
-  not: NestedEnumConnectionTypeNullableFilter
-  notIn: [ConnectionType!]
-}
-
-input EnumConnectionTypeNullableWithAggregatesFilter {
-  _count: NestedIntNullableFilter
-  _max: NestedEnumConnectionTypeNullableFilter
-  _min: NestedEnumConnectionTypeNullableFilter
-  equals: ConnectionType
-  in: [ConnectionType!]
-  not: NestedEnumConnectionTypeNullableWithAggregatesFilter
-  notIn: [ConnectionType!]
-}
-
 input EnumContextTypeFieldUpdateOperationsInput {
   set: ContextType
 }
@@ -2516,6 +2490,23 @@ input EnumContextTypeWithAggregatesFilter {
   in: [ContextType!]
   not: NestedEnumContextTypeWithAggregatesFilter
   notIn: [ContextType!]
+}
+
+input EnumRelationshipTypeNullableFilter {
+  equals: RelationshipType
+  in: [RelationshipType!]
+  not: NestedEnumRelationshipTypeNullableFilter
+  notIn: [RelationshipType!]
+}
+
+input EnumRelationshipTypeNullableWithAggregatesFilter {
+  _count: NestedIntNullableFilter
+  _max: NestedEnumRelationshipTypeNullableFilter
+  _min: NestedEnumRelationshipTypeNullableFilter
+  equals: RelationshipType
+  in: [RelationshipType!]
+  not: NestedEnumRelationshipTypeNullableWithAggregatesFilter
+  notIn: [RelationshipType!]
 }
 
 input EnumUserRoleFieldUpdateOperationsInput {
@@ -2647,23 +2638,6 @@ input NestedDateTimeWithAggregatesFilter {
   notIn: [DateTimeISO!]
 }
 
-input NestedEnumConnectionTypeNullableFilter {
-  equals: ConnectionType
-  in: [ConnectionType!]
-  not: NestedEnumConnectionTypeNullableFilter
-  notIn: [ConnectionType!]
-}
-
-input NestedEnumConnectionTypeNullableWithAggregatesFilter {
-  _count: NestedIntNullableFilter
-  _max: NestedEnumConnectionTypeNullableFilter
-  _min: NestedEnumConnectionTypeNullableFilter
-  equals: ConnectionType
-  in: [ConnectionType!]
-  not: NestedEnumConnectionTypeNullableWithAggregatesFilter
-  notIn: [ConnectionType!]
-}
-
 input NestedEnumContextTypeFilter {
   equals: ContextType
   in: [ContextType!]
@@ -2679,6 +2653,23 @@ input NestedEnumContextTypeWithAggregatesFilter {
   in: [ContextType!]
   not: NestedEnumContextTypeWithAggregatesFilter
   notIn: [ContextType!]
+}
+
+input NestedEnumRelationshipTypeNullableFilter {
+  equals: RelationshipType
+  in: [RelationshipType!]
+  not: NestedEnumRelationshipTypeNullableFilter
+  notIn: [RelationshipType!]
+}
+
+input NestedEnumRelationshipTypeNullableWithAggregatesFilter {
+  _count: NestedIntNullableFilter
+  _max: NestedEnumRelationshipTypeNullableFilter
+  _min: NestedEnumRelationshipTypeNullableFilter
+  equals: RelationshipType
+  in: [RelationshipType!]
+  not: NestedEnumRelationshipTypeNullableWithAggregatesFilter
+  notIn: [RelationshipType!]
 }
 
 input NestedEnumUserRoleFilter {
@@ -2809,8 +2800,8 @@ input NestedStringWithAggregatesFilter {
   startsWith: String
 }
 
-input NullableEnumConnectionTypeFieldUpdateOperationsInput {
-  set: ConnectionType
+input NullableEnumRelationshipTypeFieldUpdateOperationsInput {
+  set: RelationshipType
 }
 
 input NullableStringFieldUpdateOperationsInput {
@@ -2845,6 +2836,7 @@ type Query {
   getContext(where: ContextWhereUniqueInput!): Context
   getContextMapping(where: ContextMappingWhereUniqueInput!): ContextMapping
   getUser(where: UserWhereUniqueInput!): User
+  getUserCustom(where: UserWhereUniqueInput!): User!
   groupByConditionalTarget(by: [ConditionalTargetScalarFieldEnum!]!, having: ConditionalTargetScalarWhereWithAggregatesInput, orderBy: [ConditionalTargetOrderByWithAggregationInput!], skip: Int, take: Int, where: ConditionalTargetWhereInput): [ConditionalTargetGroupBy!]!
   groupByContext(by: [ContextScalarFieldEnum!]!, having: ContextScalarWhereWithAggregatesInput, orderBy: [ContextOrderByWithAggregationInput!], skip: Int, take: Int, where: ContextWhereInput): [ContextGroupBy!]!
   groupByContextMapping(by: [ContextMappingScalarFieldEnum!]!, having: ContextMappingScalarWhereWithAggregatesInput, orderBy: [ContextMappingOrderByWithAggregationInput!], skip: Int, take: Int, where: ContextMappingWhereInput): [ContextMappingGroupBy!]!
@@ -2856,6 +2848,15 @@ type Query {
 enum QueryMode {
   default
   insensitive
+}
+
+enum RelationshipType {
+  CONTAINS
+  DEPENDS_ON
+  HAS_A
+  PARENT_OF
+  REFERENCES
+  RELATES_TO
 }
 
 enum SortOrder {

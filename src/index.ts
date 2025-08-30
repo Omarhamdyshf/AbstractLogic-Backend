@@ -15,6 +15,7 @@ import permissions from './shield/Permissions.shield'
 import { pubsub } from './graphql/PubSub/pubsub'
 import { getPrisma } from './utils/helperFunctions';
 import { resolvers } from "@generated/typegraphql-prisma";
+import { UserResolver } from './graphql/resolvers/UserResolver';
 
 
 const prisma = getPrisma()
@@ -23,7 +24,7 @@ const PORT = process.env.PORT ?? 4000
 
 const main = async () => {
   const schema = await buildSchema({
-    resolvers: resolvers,
+    resolvers: [...resolvers, UserResolver],
     emitSchemaFile: true,
     pubSub: pubsub,
   })

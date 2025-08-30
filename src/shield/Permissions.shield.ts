@@ -7,6 +7,7 @@ const permissions = shield({
   Mutation: {
     '*': allow,
   },
-})
+
+}, {debug: true})
 
 export default permissions
